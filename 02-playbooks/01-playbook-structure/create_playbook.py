@@ -12,6 +12,7 @@ If /path/to/playbookname already exists, we only create the roles that don't exi
 
 Our structure is loosely based on https://github.com/enginyoyen/ansible-best-practises:
 
+###############################################################################
 production.ini            # inventory file for production stage
 development.ini           # inventory file for development stage
 test.ini                  # inventory file for test stage
@@ -40,6 +41,10 @@ roles/
 
 extension/
     setup                 # All the setup files for updating roles and ansible dependencies
+###############################################################################
+
+
+I'm putting more emphasis on structured roles here, and less on external dependencies/playbooks.
 
 """
 
