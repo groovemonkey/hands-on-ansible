@@ -1,0 +1,46 @@
+# run locally with: ansible-playbook playbook.yml --connection=local
+
+---
+- hosts: 127.0.0.1
+  become: no
+  vars:
+    playbook_name: skeleton
+    location: /tmp/{{ playbook_name }}
+    roles: ["web", "database", "cache", "dbcache"]
+
+
+  tasks:
+    - name: Check if the playbook already exists
+      stat: path={{ location }}
+      register: playbook_directory
+
+    - name: Create playbook directory
+      file: path={{ item }} state=directory
+      when: playbook_directory.stat.exists == False
+      with_items:
+        - "{{ location }}"
+        - "{{ location }}/group_vars"
+        - "{{ location }}/plays"
+        - "{{ location }}/roles"
+
+    - name: Create playbook files
+      file: path={{ item }} state=touch
+      with_items:
+        - "{{ location }}/production.ini"
+        - "{{ location }}/development.ini"
+        - "{{ location }}/test.ini"
+        - "{{ location }}/group_vars/all"
+        - "{{ location }}/plays/ansible.cfg"
+
+    - name: Create role + task directories
+      file: path={{ location }}/roles/{{ item }}/tasks state=directory
+      with_items: "{{ roles }}"
+
+    - name: Create task files for each role
+      file: path={{ location }}/roles/{{ item }}/tasks/tasks.yml state=touch
+      with_items: "{{ roles }}"
+
+    # - name: Create role subdirectories
+    #   file: path={{ location }}/roles/{{ item }}/ state=directory
+    #   with_items: "{{ roles }}"
+
