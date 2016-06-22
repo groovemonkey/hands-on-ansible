@@ -1,0 +1,42 @@
+---
+- hosts: all
+  # become root (using sudo, by default)
+  become: yes
+  tasks:
+    - name: Install nginx.
+    # the 'package' module is new, and abstracts things like 'yum' 'apt,' and 'pkg' away
+    package: name={{ item }} state=present
+    # iterates over items
+    with_items:
+    - nginx
+    # superfluous, should be split into a separate playbook
+    - vim
+    - nano
+    - sshguard
+
+    - name: Copy nginx config files (main config and vhost config)
+    # copy FROM ansible controller to target machine (fetch is the opposite)
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0644
+    # more complex iteration: each item now has src: and dest: attributes
+    with_items:
+      - src: "nginx.conf"
+      dest: "/etc/nginx/nginx.conf"
+      - src: "mywebsite.conf"
+      dest: "/etc/nginx/conf.d/mywebsite.conf"
+
+    - name: Check if default nginx vhost still exists
+      stat: path=/etc/nginx/sites-enabled/default
+      register: default_conf
+
+    - name: Remove default nginx vhost configuration
+      file: path=/etc/nginx/sites-enabled/default state=absent
+      when: default_conf.stat.exists
+
+
+    - name: Start nginx at boot + make sure it's running right now.
+    service: name=httpd state=restarted enabled=yes
