@@ -10,7 +10,7 @@
       with_items:
         - nginx
         # superfluous, should be split into a separate playbook
-        - vim
+        #- vim
         - nano
         - sshguard
         - curl

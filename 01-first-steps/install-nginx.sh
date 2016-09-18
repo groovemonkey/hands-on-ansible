@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Install nginx.
 apt-get update
-apt-get install -y nginx vim sshguard nano curl
+apt-get install -y nginx sshguard nano curl # vim
 
 # Ensure website directory exists
 mkdir -p /var/www/mywebsite
