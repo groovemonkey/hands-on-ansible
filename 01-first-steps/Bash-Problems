@@ -1,0 +1,14 @@
+Problems
+
+-We're running this on the target machine automatically with Ansible. With bash:
+	-scp script + resources
+	-ssh to remote machine; run
+	-clean up
+
+0. Hardcoded IP in mywebsite.conf
+1. We want to comment out 'vim' -- it takes up too much space for our server
+2. We want to run this on 1000 servers -- only our 'web' servers, though.
+3. We want to add a second site, stop hardcoding everything, and re-use a single configuration file
+4. We also want to set up a database server, which is logically a part of our web application, in the same 'deployment' step.
+5. We want to enforce a consistent structure between scripts
+
