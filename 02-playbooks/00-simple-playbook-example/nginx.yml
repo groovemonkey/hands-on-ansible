@@ -1,0 +1,46 @@
+---
+- hosts: all
+  vars:
+    # used for filepaths
+    site_name: "tutorialinux"
+    # used in the website's markup
+    site_title: "Hope."
+    # used in the web server configuration file
+    site_url: "www.tutorialinux.com"
+
+  tasks:
+    - name: Install nginx.
+      package: name=nginx state=latest
+
+    - name: Create website directory
+      file: path="/var/www/{{ site_name }}" state=directory mode=0755
+
+    - name: Create main nginx config file
+      template:
+        src: "templates/nginx.conf"
+        dest: "/etc/nginx/nginx.conf"
+      notify:
+      - restart nginx
+    
+    - name: Create nginx vhost config file
+      template:
+        src: "templates/website.conf"
+        dest: "/etc/nginx/conf.d/{{ site_name }}.conf"
+      notify:
+      - restart nginx
+        
+    - name: Create website
+      template:
+        src: "templates/index.html"
+        dest: "/var/www/{{ site_name }}/index.html"
+
+    - name: Remove default nginx vhost configuration
+      file: path=/etc/nginx/sites-enabled/default state=absent
+      notify:
+      - restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
