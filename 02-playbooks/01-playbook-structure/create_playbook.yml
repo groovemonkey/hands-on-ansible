@@ -6,7 +6,7 @@
   vars:
     playbook_name: skeleton
     location: /tmp/{{ playbook_name }}
-    roles: ["web", "database", "cache", "dbcache"]
+    roles: ["web", "database", "cache", "common"]
 
 
   tasks:

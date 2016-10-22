@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-"""
+HELP_TEXT = """
 Usage: ./create_playbook.py /path/to/playbookname [role1 role2 ...]
 Creates an empty playbook skeleton, with any roles that are specified.
 
-e.g. ./create_playbook.py /tmp/pyplaybook web db cache
+e.g. ./create_plafybook.py /tmp/pyplaybook web db cache
 
 
 If /path/to/playbookname already exists, we only create the roles that don't exist yet, according to our structure.
@@ -52,14 +52,23 @@ def main():
     args = sys.argv
     if len(args) < 2:
         print("Invalid invocation. Exiting.")
+        print(HELP_TEXT)
+        sys.exit(1)
 
     playbook_location = args[1]
     roles_to_create = args[2:]
 
+    if playbook_location in ["help", "-h", "--help"]:
+        print(HELP_TEXT)
+        sys.exit(0)
+    else:
+        # this is a real path, let's make sure it's absolute
+        playbook_location = os.path.abspath(playbook_location)
+
     # If that location already exists, fail
     if os.path.isdir(playbook_location) or os.path.isfile(playbook_location):
         print("Can't create a playbook with that path: something already exists there!")
-        return
+        sys.exit(1)
 
     # Looks like everything is OK, let's create the playbook.
     print("Creating playbook skeleton")
