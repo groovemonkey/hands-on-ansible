@@ -20,7 +20,6 @@
       with_items:
         - "{{ location }}"
         - "{{ location }}/group_vars"
-        - "{{ location }}/plays"
         - "{{ location }}/roles"
 
     - name: Create playbook files
@@ -30,7 +29,6 @@
         - "{{ location }}/production.ini"
         - "{{ location }}/development.ini"
         - "{{ location }}/group_vars/all"
-        - "{{ location }}/plays/ansible.cfg"
 
     - name: Create role + task directories
       file: path={{ location }}/roles/{{ item }}/tasks state=directory
@@ -42,6 +40,18 @@
 
     - name: Create templates directory for each role
       file: path={{ location }}/roles/{{ item }}/templates state=directory
+      with_items: "{{ roles }}"
+
+    - name: Create files directory for each role
+      file: path={{ location }}/roles/{{ item }}/files state=directory
+      with_items: "{{ roles }}"
+
+    - name: Create vars directory for each role
+      file: path={{ location }}/roles/{{ item }}/vars state=directory
+      with_items: "{{ roles }}"
+
+    - name: Create meta directory for each role
+      file: path={{ location }}/roles/{{ item }}/meta state=directory
       with_items: "{{ roles }}"
 
     - name: Create task file for each role

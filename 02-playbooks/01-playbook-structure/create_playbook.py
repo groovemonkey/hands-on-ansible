@@ -28,11 +28,6 @@ group_vars/
     postgresql/           # here we assign variables to postgresql groups
         postgresql.yml    # Each file will correspond to a role i.e. postgresql
         postgresql-password.yml   # Encrypted password file
-plays/
-    ansible.cfg           # Ansible.cfg file that holds all ansible config
-    webservers.yml        # playbook for webserver tier
-    postgresql.yml        # playbook for postgresql tier
-
 roles/
     roles_requirements.yml# All the information about the roles
     external              # All the roles that are in git or ansible galaxy
@@ -81,15 +76,13 @@ def create_playbook(location):
     """
     dirs_to_create = [
         "group_vars",
-        "plays",
         "roles",
     ]
     files_to_create = [
         "production.ini",
         "development.ini",
         "hosts.ini",
-        os.path.join("group_vars", "all"),
-        os.path.join("plays", "ansible.cfg"),
+        os.path.join("group_vars", "all")
     ]
 
     # Create the playbook skeleton
@@ -112,6 +105,9 @@ def create_role(location, rolename):
         os.path.join(location, "roles", rolename, "tasks"),
         os.path.join(location, "roles", rolename, "handlers"),
         os.path.join(location, "roles", rolename, "templates"),
+        os.path.join(location, "roles", rolename, "files"),
+        os.path.join(location, "roles", rolename, "vars"),
+        os.path.join(location, "roles", rolename, "meta"),
     ]
     files_to_create = [
         os.path.join(location, "roles", rolename, "tasks", "main.yml"),
