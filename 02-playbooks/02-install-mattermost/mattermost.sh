@@ -3,7 +3,6 @@
 # from http://docs.mattermost.com/install/prod-ubuntu.html
 
 
-
 ###########################
 ##### 1: Database Setup
 ###########################
@@ -19,15 +18,17 @@ exit
 
 
 
-# allow postgres to listen on all public interfaces, if you are using a separate app server
+# If you are using a separate app server, use the AWS VPC address or DNS to allow connections from it.
 # sudo vi /etc/postgresql/$PG_VERSION/main/postgresql.conf
 
-# sudo vi /etc/postgresql/9.3/main/pg_hba.conf
+# sudo vi /etc/postgresql/9.5/main/pg_hba.conf
 # IPv4 local connections --> 10.10.10.2/32 md5
 
 sudo /etc/init.d/postgresql reload
+(or)
+sudo systemctl reload postgresql
 
-# try connecting
+# if you're using a separate app server...try connecting from it
 psql --host=10.10.10.1 --dbname=mattermost --username=mmuser
 
 
@@ -40,16 +41,16 @@ adduser mattermost
 su - mattermost
 
 # Download the application
-LATEST_MM_VERSION="1.4.0"
+LATEST_MM_VERSION="3.3.0"
 wget https://releases.mattermost.com/${LATEST_MM_VERSION}/mattermost-team-${LATEST_MM_VERSION}-linux-amd64.tar.gz
-tar -xvzf mattermost-team-${LATEST_MM_VERSION}-linux-amd64.tar.gz
+tar -xzf mattermost-team-${LATEST_MM_VERSION}-linux-amd64.tar.gz
 
 # rename and create 'data' directory
 mv mattermost mattermost_app
 mkdir -p mattermost_app/data
 
 
-vim mattermost_app/config.json
+vim mattermost_app/config/config.json
     replace DriverName": "mysql" with DriverName": "postgres"
     # do we need to change this to a unix socket? Maybe not a bad idea.
     replace "DataSource": "postgres://mmuser:mmuser_password@localhost:5432/mattermost?sslmode=disable&connect_timeout=10"
@@ -63,6 +64,7 @@ cd ~/mattermost_app/bin
 vim /etc/systemd/system/mattermost.service
 
 # add the following content
+[Unit]
 Description=Mattermost
 After=syslog.target network.target
 
@@ -72,9 +74,11 @@ WorkingDirectory=/opt/mattermost/bin
 User=mattermost
 ExecStart=/opt/mattermost/bin/platform
 PIDFile=/var/spool/mattermost/pid/master.pid
+Requires=
 
 [Install]
 WantedBy=multi-user.target
+
 
 
 # reload systemctl daemons to discover this service
@@ -108,7 +112,9 @@ vim /etc/nginx/nginx.conf
 # add the mattermost vhost (have nginx proxy for mattermost on port 80)
 vim /etc/nginx/sites-available/mattermost
 YOURDOMAIN=tutorialinux.com
-server_name mattermost.${YOURDOMAIN}.com;
+
+server {
+    server_name mattermost.${YOURDOMAIN}.com;
     location / {
         client_max_body_size 50M;
         proxy_set_header Upgrade $http_upgrade;
@@ -127,11 +133,11 @@ server_name mattermost.${YOURDOMAIN}.com;
 # remove default vhost
 sudo rm /etc/nginx/sites-enabled/default
 
+# enable site
+ln -s /etc/nginx/sites-available/mattermost /etc/nginx/sites-enabled/mattermost
+
 
 # verify, start, enable nginx at boot
-nginx -t
-systemctl start nginx
+systemctl reload nginx
 systemctl status nginx
 systemctl enable nginx
-
-
