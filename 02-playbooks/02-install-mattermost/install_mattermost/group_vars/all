@@ -1,0 +1,33 @@
+---
+
+####################################################
+# Most common configuration options:
+####################################################
+mattermost_domain: mattermost.tutorialinux.com
+
+
+####################################################
+# Database
+####################################################
+# change this if you're splitting your database into a separate machine
+# mattermost will try to connect to {{ db_server }}:5432
+db_server: localhost
+# if you're using a separate database server, enable this
+db_ssl_mode: disable
+
+db_user: mmuser
+db_password: "your_mattermost_user_password"
+
+
+####################################################
+# System
+####################################################
+mattermost_sysuser: "mattermost"
+mattermost_directory: /home/{{ mattermost_sysuser }}/mattermost_app
+
+
+####################################################
+# Web
+####################################################
+LATEST_MM_VERSION: "3.4.0"
+LATEST_MM_URL: https://releases.mattermost.com/{{ LATEST_MM_VERSION }}/mattermost-team-{{ LATEST_MM_VERSION }}-linux-amd64.tar.gz

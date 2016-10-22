@@ -1,0 +1,73 @@
+---
+# Webserver Configuration
+
+- name: SYSTEM | Install util packages
+  package: name={{ item }} state=present
+  with_items:
+    - python-apt
+
+- name: NGINX | Ensure that nginx PPA is added to Ubuntu
+  apt_repository: repo='ppa:nginx/stable'
+
+- name: NGINX | Install nginx
+  package: name=nginx state=present update_cache=yes
+
+- name: NGINX | Remove default vhost
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: NGINX | Configure mattermost vhost
+  template: src=mattermost.conf dest=/etc/nginx/conf.d/mattermost.conf
+  notify:
+    - reload nginx
+
+- name: NGINX | nginx should be running, and enabled at boot
+  service: name=nginx state=started enabled=yes
+
+
+# Application Install
+- name: SYSTEM | Create mattermost system user
+  user: name="{{ mattermost_sysuser }}" comment="Mattermost"
+
+- stat: path={{ mattermost_directory }}
+  register: mattermost_install
+
+- block:
+    - name: INSTALL | Download and extract Mattermost
+      # unarchive is new in 2.0, and remote_src requires 2.2. For older versions, use 'get_url' and 'unarchive'
+      # unarchive: remote_src=yes src="{{ LATEST_MM_URL }}" dest="/home/{{ mattermost_sysuser }}/"
+      get_url: url={{ LATEST_MM_URL }} dest=/home/{{ mattermost_sysuser }}/mattermost.tar.gz
+
+    - name: INSTALL | Unarchive mattermost.tar.gz
+      unarchive: copy=no src=/home/{{ mattermost_sysuser }}/mattermost.tar.gz dest=/home/{{ mattermost_sysuser }}/
+      
+    - name: INSTALL | Rename downloaded mattermost directory
+      command: mv /home/{{ mattermost_sysuser }}/mattermost {{ mattermost_directory }}
+
+    - name: INSTALL | Ensure Mattermost appdata directory exists
+      file: path={{ mattermost_directory }}/data state=directory mode=0755 owner="{{ mattermost_sysuser }}"
+
+    - name: INSTALL | Set up main Mattermost config file
+      template: src=mattermost_config.json dest="{{ mattermost_directory }}/config/config.json"
+
+    - name: INSTALL | Remove downloaded mattermost.tar.gz
+      file: path=/home/{{ mattermost_sysuser }}/mattermost.tar.gz state=deleted
+    
+    - name: INSTALL | Set proper permissions on mattermost app directory
+      file:
+        path: "{{ mattermost_directory }}"
+        # mode: 0755
+        owner: "{{ mattermost_sysuser }}"
+        group: "{{ mattermost_sysuser }}"
+        recurse: yes
+
+  # Only execute the above task block if we don't already have a Mattermost install directory
+  when: mattermost_install.stat.exists == False
+
+
+- name: MATTERMOST | Create systemd unit file
+  template: src=mattermost.service dest=/etc/systemd/system/mattermost.service
+  notify:
+    - reload systemd
+
+- name: MATTERMOST | Mattermost should be running, and enabled at boot
+  service: name=mattermost state=started enabled=yes

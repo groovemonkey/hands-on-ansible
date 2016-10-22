@@ -70,9 +70,9 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/mattermost/bin
+WorkingDirectory=/home/mattermost/mattermost_app/bin
 User=mattermost
-ExecStart=/opt/mattermost/bin/platform
+ExecStart=/home/mattermost/mattermost_app/bin/platform
 PIDFile=/var/spool/mattermost/pid/master.pid
 Requires=
 

@@ -1,0 +1,31 @@
+---
+- name: SYSTEM | Install basic database packages
+  package: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - python-psycopg2
+    # - gtar
+
+- name: POSTGRES | Create mattermost database
+  become: true
+  become_user: postgres
+  postgresql_db:
+    name: mattermost
+
+- name: POSTGRES | Create mattermost DB user
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    db: mattermost
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: ALL
+
+- name: POSTGRES | Shore up DB privileges for 'mmuser'
+  become: yes
+  become_user: postgres
+  postgresql_user: 
+    name: "{{ db_user }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB
+
