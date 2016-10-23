@@ -1,12 +1,12 @@
-# run locally with: ansible-playbook playbook.yml --connection=local
+# run locally with: ansible-playbook create_playbook.yml --connection=local
 
 ---
 - hosts: 127.0.0.1
   become: no
   vars:
-    playbook_name: skeleton
+    playbook_name: ansibleskeleton
     location: /tmp/{{ playbook_name }}
-    roles: ["web", "database", "cache", "common"]
+    roles: ["web", "database", "common"]
 
 
   tasks:
@@ -28,27 +28,27 @@
         - "{{ location }}/group_vars/all"
 
     - name: Create role + task directories
-      file: path={{ location }}/roles/{{ item }}/tasks state=directory
+      file: path={{ location }}/roles/{{ item }}/tasks state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create handler directory for each role
-      file: path={{ location }}/roles/{{ item }}/handlers state=directory
+      file: path={{ location }}/roles/{{ item }}/handlers state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create templates directory for each role
-      file: path={{ location }}/roles/{{ item }}/templates state=directory
+      file: path={{ location }}/roles/{{ item }}/templates state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create files directory for each role
-      file: path={{ location }}/roles/{{ item }}/files state=directory
+      file: path={{ location }}/roles/{{ item }}/files state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create vars directory for each role
-      file: path={{ location }}/roles/{{ item }}/vars state=directory
+      file: path={{ location }}/roles/{{ item }}/vars state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create meta directory for each role
-      file: path={{ location }}/roles/{{ item }}/meta state=directory
+      file: path={{ location }}/roles/{{ item }}/meta state=directory mode=0755
       with_items: "{{ roles }}"
 
     - name: Create task file for each role
