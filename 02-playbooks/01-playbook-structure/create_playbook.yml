@@ -25,9 +25,6 @@
     - name: Create playbook files
       file: path={{ item }} state=touch
       with_items:
-        - "{{ location }}/hosts.ini"
-        - "{{ location }}/production.ini"
-        - "{{ location }}/development.ini"
         - "{{ location }}/group_vars/all"
 
     - name: Create role + task directories

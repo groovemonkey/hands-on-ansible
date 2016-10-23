@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+import sys
+import os
+
+
 HELP_TEXT = """
 Usage: ./create_playbook.py /path/to/playbookname [role1 role2 ...]
 Creates an empty playbook skeleton, with any roles that are specified.
@@ -7,44 +11,32 @@ Creates an empty playbook skeleton, with any roles that are specified.
 e.g. ./create_plafybook.py /tmp/pyplaybook web db cache
 
 
-If /path/to/playbookname already exists, we only create the roles that don't exist yet, according to our structure.
+If /path/to/playbookname already exists, we only create the roles that don't 
+exist yet, according to our structure.
 
-
-Our structure is loosely based on https://github.com/enginyoyen/ansible-best-practises:
 
 ###############################################################################
-production.ini            # inventory file for production stage
-development.ini           # inventory file for development stage
-test.ini                  # inventory file for test stage
-vpass                     # ansible-vault password file
-                          # This file should not be committed into the repository
-                          # therefore file is in ignored by git
 group_vars/
-    all/                  # variables under this directory belongs all the groups
-        apt.yml           # ansible-apt role variable file for all groups
-    webservers/           # here we assign variables to webservers groups
-        apt.yml           # Each file will correspond to a role i.e. apt.yml
-        nginx.yml         # ""
-    postgresql/           # here we assign variables to postgresql groups
-        postgresql.yml    # Each file will correspond to a role i.e. postgresql
-        postgresql-password.yml   # Encrypted password file
-roles/
-    roles_requirements.yml# All the information about the roles
-    external              # All the roles that are in git or ansible galaxy
-                          # Roles that are in roles_requirements.yml file will be downloaded into this directory
-    internal              # All the roles that are not public
+    all                   # The main file for defining variables for this playbook
 
-extension/
-    setup                 # All the setup files for updating roles and ansible dependencies
+roles/
+    role1/                # Each role
+        files/            # Role-specific files which will be copied to the remote machine
+        handlers/         # Role-specific handlers
+            main.yml      # handler file
+        tasks/            # Role-specific tasks
+            main.yml      # task file
+        templates/        # Role-specific templates
+        vars              # Role-specific variables, although I recommend using group_vars/all instead
+        meta/             # Files that establish role dependencies
+
 ###############################################################################
 
 
-I'm putting more emphasis on structured roles here, and less on external dependencies/playbooks.
+I'm putting more emphasis on well-structured roles here, and less on external 
+dependencies/playbooks.
 
 """
-
-import sys
-import os
 
 
 def main():
@@ -88,9 +80,6 @@ def create_playbook(location):
         "roles",
     ]
     files_to_create = [
-        "production.ini",
-        "development.ini",
-        "hosts.ini",
         os.path.join("group_vars", "all")
     ]
 
