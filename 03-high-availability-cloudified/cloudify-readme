@@ -1,0 +1,44 @@
+EXAMPLE CLOUD SETUP (AWS)
+
+
+RDS:
+DBMASTERUSER=your_master_username
+DBMASTERPASS: your_master_pass
+DBNAME=mattermost
+
+DB_USER=mmuser
+DB_USER_PASS=your_mmuser_pass
+
+
+RDS hostname: postgres-id-rds.az.rds.amazonaws.com (:5432)
+
+# on your EC2 instance, check that you can connect (are on the same VPC/subnet) e.g.
+psql -h postgres-id-rds.az.rds.amazonaws.com -U $DBMASTERUSER $DBNAME
+
+
+
+1. Create RDS security group (allow Postgres IN on tcp/5432)
+2. Create RDS instance (small is fine)
+
+2. Create a base image (mattermost-base) to spawn other images from
+    -only install postgresql-client package; server no longer needed
+    -create an image from your EC2 instance (name should indicate mattermost version)
+    -copy to other Availability Zone
+
+3. Set up ELB
+    -round robin?
+
+4. Create an autoscaling group
+    -launch mattermost ec2 instances (from your template) in both AZs
+    -min 2 instances, max 5
+    -scale when CPU load is >95% for more than 2 mins.
+
+####
+
+How do we update binaries? -- Blue/Green deployment
+
+1. Create new template (new mattermost version #)
+2. Create new autoscaling group with same # of EC2 instances, from new template, under the same load balancer as old one
+3. Once the new instances have booted, modify OLD autoscaling group to have 0 instances running (drain traffic)
+
+
