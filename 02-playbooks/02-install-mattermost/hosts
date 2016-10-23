@@ -1,5 +1,5 @@
 [webservers]
-10.0.3.23
+$YOUR_LXC_IP
 
 [dbservers]
-10.0.3.23
+$YOUR_LXC_IP

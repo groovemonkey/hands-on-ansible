@@ -50,7 +50,7 @@
       template: src=mattermost_config.json dest="{{ mattermost_directory }}/config/config.json"
 
     - name: INSTALL | Remove downloaded mattermost.tar.gz
-      file: path=/home/{{ mattermost_sysuser }}/mattermost.tar.gz state=deleted
+      file: path=/home/{{ mattermost_sysuser }}/mattermost.tar.gz state=absent
     
     - name: INSTALL | Set proper permissions on mattermost app directory
       file:
@@ -60,14 +60,17 @@
         group: "{{ mattermost_sysuser }}"
         recurse: yes
 
+    - name: MATTERMOST | Create systemd unit file
+      template: src=mattermost.service dest=/etc/systemd/system/mattermost.service
+      notify:
+        - reload systemd
+
+    # Perhaps this would make more sense *outside* of this task block?
+    - name: MATTERMOST | Mattermost should be running, and enabled at boot
+      service: name=mattermost state=started enabled=yes
+      notify:
+        - reload nginx
+ 
   # Only execute the above task block if we don't already have a Mattermost install directory
   when: mattermost_install.stat.exists == False
 
-
-- name: MATTERMOST | Create systemd unit file
-  template: src=mattermost.service dest=/etc/systemd/system/mattermost.service
-  notify:
-    - reload systemd
-
-- name: MATTERMOST | Mattermost should be running, and enabled at boot
-  service: name=mattermost state=started enabled=yes
