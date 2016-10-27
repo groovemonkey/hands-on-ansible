@@ -1,22 +1,20 @@
 ---
-# Run with ansible-playbook <filename> -u ubuntu
+# Run with ansible-playbook <filename> -k
 #   (make sure to add the IPs of machines you want to manage to /etc/ansible/hosts first)
 
 - hosts: all
-  
-  vars:
-    ansible_ssh_user: ubuntu
-    become: yes
-    become_user: root
-    become_method: sudo
+  gather_facts: False
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  become_method: sudo
 
   tasks:
-    # Install python
-    - name: Install python
-      raw: "apt-get -y install python"
+    - name: Install Python 2
+      raw: test -e /usr/bin/python || (apt-get update && apt-get install -y python)
 
     - name: Fancy way of doing authorized_keys
-    authorized_key: user=root
+      authorized_key: user=root
                     exclusive=no
                     key="{{ lookup('file', '~/.ssh/id_rsa.pub')  }}"
 
