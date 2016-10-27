@@ -1,0 +1,117 @@
+---
+# AWS tasks are run 'locally'
+
+# Authentication details should be passed in as arguments or exported in the shell before running this playbook
+# Ideally they should be stored in Hashicorp's 'Vault'
+# e.g.
+# export AWS_ACCESS_KEY_ID='my-access-key123'
+# export AWS_SECRET_ACCESS_KEY='sekrit23418'
+#
+# Finally, run with `ansible-playbook provision-aws-mattermost.yml`
+
+- name: Provision EC2 and RDS infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  # vars:
+  #   - aws_region: us-east-1
+  #   # A basic web security group that allows 22, 80, and 443 inbound
+  #   - security_group_id: "basic-web-1"
+
+  #   - web_instance_count: 1
+  #   - web_ami_id: "ami-40d28157"
+  #   - aws_pubkey_name: "tutorialinux-ansible"
+
+  #   - db_master_name: "mattermost-db"
+  #   - db_replica_name: "mattermost-replica"
+  #   - db_master_user: "mmuser"
+  #   - db_master_pass: "masterpassy"
+
+  tasks:
+    - name: Provision a database instance
+      rds:
+        command: create
+        instance_name: "{{ db_master_name }}"
+        db_engine: postgres
+        size: 10
+        instance_type: db.t2.micro
+        region: "{{ aws_region }}"
+        username: "{{ db_master_user }}"
+        password: "{{ db_master_pass }}"
+        tags:
+          Environment: prod
+          Application: mattermost
+      register: rdsmachines
+
+    - pause: prompt="Now you'll need to wait for 5-10 minutes for your RDS instance to come up, before hitting ENTER to continue this Ansible playbook"
+    - debug: var=rdsmachines verbosity=1
+    - set_fact: db_server="{{ rdsmachines['instance']['endpoint'] }}"
+
+    - name: Save our RDS servername to a local file.
+      local_action: copy content={{ db_server }} dest=group_vars/rdsname
+    # - debug: var=db_server verbosity=1
+
+
+    # # TODO: Don't need this anymore...
+    # - name: Add db instance IP to host group
+    #   add_host: hostname={{ rdsmachines['instance']['endpoint'] }} groupname=dbservers
+
+    # - name: Provision a read-only replica of our database instance
+    #   rds:
+    #     command: replicate
+    #     instance_name: "{{ db_replica_name }}"
+    #     region: "{{ aws_region }}"
+    #     source_instance: "{{ db_master_name }}"
+        
+    #     #wait: yes
+    #     # wait_for: state=started host={{ rdsmachines['instance']['endpoint'] }} port=5432 delay=60 timeout=320
+    #     # wait_for: host="{{ rdsmachines['instance'].status == 'available' }}" port=5432 delay=60 timeout=320 state=started
+    #     #wait_timeout: 600
+
+
+    - name: Provision a set of web instances
+      ec2:
+        region: "{{ aws_region }}"
+        group: "{{ security_group_id }}"
+        key_name: "{{ aws_pubkey_name }}"
+        instance_type: t2.micro
+        image: "{{ web_ami_id }}"
+        wait: true
+        exact_count: "{{ web_instance_count }}"
+        count_tag:
+          Name: Mattermost
+        instance_tags:
+          Name: mattermost-web
+          Environment: prod
+          Application: mattermost
+      register: ec2
+    
+    - name: Add all web instance IPs to host group
+      add_host: hostname={{ item.public_ip }} groupname=webservers
+      with_items: '{{ ec2.instances }}'
+    
+    # - pause: prompt="Amazon is really slow sometimes, and Ansible's timeout doesn't always work."
+
+    - name: Wait for SSH to come up
+      wait_for: host={{ item.public_dns_name }} port=22 delay=60 timeout=320 state=started
+      with_items: '{{ ec2.instances }}'
+
+###########
+# And now, the original playbook from the single-host version.
+# We don't need the 'database' role, since an RDS instance is not treated as a normal machine.
+###########
+
+- hosts: webservers
+  name: Webserver Setup
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: false
+  vars:
+    db_ssl_mode: enable
+  roles:
+    - bootstrap
+    - common
+    - web
+

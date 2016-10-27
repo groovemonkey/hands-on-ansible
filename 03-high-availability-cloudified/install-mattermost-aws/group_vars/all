@@ -1,0 +1,39 @@
+---
+
+####################################################
+# EC2 + RDS
+####################################################
+# ansible_ssh_user: ubuntu
+
+aws_region: us-east-1
+# A basic web security group that allows 22, 80, and 443 inbound
+security_group_id: "basic-web-1"
+
+web_instance_count: 1
+web_ami_id: "ami-40d28157"
+aws_pubkey_name: "tutorialinux-ansible"
+
+db_master_name: "mattermost-db"
+db_replica_name: "mattermost-replica"
+db_master_user: "mmuser"
+db_master_pass: "masterpassy"
+
+
+####################################################
+# Most common configuration options:
+####################################################
+mattermost_domain: mattermost.tutorialinux.com
+
+
+####################################################
+# System
+####################################################
+mattermost_sysuser: "mattermost"
+mattermost_directory: /home/{{ mattermost_sysuser }}/mattermost_app
+
+
+####################################################
+# Web
+####################################################
+LATEST_MM_VERSION: "3.4.0"
+LATEST_MM_URL: https://releases.mattermost.com/{{ LATEST_MM_VERSION }}/mattermost-team-{{ LATEST_MM_VERSION }}-linux-amd64.tar.gz
