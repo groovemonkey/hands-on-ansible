@@ -1,0 +1,18 @@
+ansible 2.2 (ad-hoc commands)
+
+ssh-add -L
+ssh-add ~/.ssh/id_rsa
+sudo lxc-ls --fancy
+
+ansible 10.0.3.41 -m ping -u root
+ansible web -m ping -u root -i hosts
+
+ansible allmachines -m ping -i hosts -u root
+ansible allmachines -a "free -m" -i hosts -u root
+
+
+ansible web -m service -a "name=nginx state=restarted" -i hosts -u root
+
+ansible web -m package -a "name=nginx state=installed" -i hosts -u root
+
+

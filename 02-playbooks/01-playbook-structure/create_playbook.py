@@ -80,7 +80,8 @@ def create_playbook(location):
         "roles",
     ]
     files_to_create = [
-        os.path.join("group_vars", "all")
+        os.path.join("group_vars", "all"),
+        "playbook.yml",
     ]
 
     # Create the playbook skeleton

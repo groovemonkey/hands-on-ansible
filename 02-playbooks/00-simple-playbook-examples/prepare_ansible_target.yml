@@ -15,8 +15,8 @@
 
     - name: Fancy way of doing authorized_keys
       authorized_key: user=root
-                    exclusive=no
-                    key="{{ lookup('file', '~/.ssh/id_rsa.pub')  }}"
+                      exclusive=no
+                      key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
     #- name: Create /root/.ssh
     #  file: path=/root/.ssh state=directory mode=0700

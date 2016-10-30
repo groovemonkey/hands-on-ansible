@@ -1,4 +1,7 @@
 ---
+# Run with ansible-playbook <filename> -u root
+#   (make sure to add the IPs of machines you want to manage to /etc/ansible/hosts first)
+
 - hosts: all
   vars:
     # used for filepaths
