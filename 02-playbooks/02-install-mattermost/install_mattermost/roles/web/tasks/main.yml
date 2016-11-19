@@ -71,11 +71,11 @@
 # Create either a systemd or an upstart configuration file
 # for the mattermost service -- hopefully not both
 - name: INIT | Crude Check for systemd
-  stat: path=/etc/systemd
+  stat: path=/usr/lib/systemd
   register: systemd_installed
 
 - name: INIT | Crude Check for upstart
-  stat: path=/etc/init/
+  stat: path=/usr/share/upstart
   register: upstart_installed
 
 - name: INIT | Create systemd unit file
