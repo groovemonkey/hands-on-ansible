@@ -5,7 +5,7 @@ After=syslog.target network.target
 [Service]
 Type=simple
 WorkingDirectory={{ mattermost_directory }}/bin
-User=mattermost
+User={{ mattermost_sysuser }}
 ExecStart={{ mattermost_directory }}/bin/platform
 PIDFile=/var/spool/mattermost/pid/master.pid
 Requires=
