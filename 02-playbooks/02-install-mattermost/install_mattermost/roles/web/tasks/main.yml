@@ -7,10 +7,10 @@
     - python-apt
 
 - name: NGINX | Ensure that nginx PPA is added to Ubuntu
-  apt_repository: repo='ppa:nginx/stable'
+  apt_repository: repo='ppa:nginx/stable' update_cache=yes
 
 - name: NGINX | Install nginx
-  package: name=nginx state=present update_cache=yes
+  package: name=nginx state=present
 
 - name: NGINX | Remove default vhost
   file: path=/etc/nginx/sites-enabled/default state=absent
@@ -23,7 +23,6 @@
 - name: NGINX | nginx should be running, and enabled at boot
   service: name=nginx state=started enabled=yes
 
-
 # Application Install
 - name: SYSTEM | Create mattermost system user
   user: name="{{ mattermost_sysuser }}" comment="Mattermost"
@@ -32,13 +31,17 @@
   register: mattermost_install
 
 - block:
-    - name: INSTALL | Download and extract Mattermost
-      # unarchive is new in 2.0, and remote_src requires 2.2. For older versions, use 'get_url' and 'unarchive'
+    - name: INSTALL | Download Mattermost
+      ## unarchive is new in 2.0, and remote_src requires 2.2. For older versions, use 'get_url' and 'unarchive'
       # unarchive: remote_src=yes src="{{ LATEST_MM_URL }}" dest="/home/{{ mattermost_sysuser }}/"
-      get_url: url={{ LATEST_MM_URL }} dest=/home/{{ mattermost_sysuser }}/mattermost.tar.gz
-
+      ## get_url bugs out on target machines using older versions of Ubuntu
+      # get_url: url="{{ LATEST_MM_URL }}" dest="/home/{{ mattermost_sysuser }}/{{ LATEST_MM_DOWNLOADNAME }}"
+      #
+      ## Forget it; we're using wget
+      raw: (cd /home/{{ mattermost_sysuser }}/ && wget {{ LATEST_MM_URL }})
+      
     - name: INSTALL | Unarchive mattermost.tar.gz
-      unarchive: copy=no src=/home/{{ mattermost_sysuser }}/mattermost.tar.gz dest=/home/{{ mattermost_sysuser }}/
+      unarchive: copy=no src=/home/{{ mattermost_sysuser }}/{{ LATEST_MM_DOWNLOADNAME }} dest=/home/{{ mattermost_sysuser }}/
       
     - name: INSTALL | Rename downloaded mattermost directory
       command: mv /home/{{ mattermost_sysuser }}/mattermost {{ mattermost_directory }}
@@ -46,31 +49,46 @@
     - name: INSTALL | Ensure Mattermost appdata directory exists
       file: path={{ mattermost_directory }}/data state=directory mode=0755 owner="{{ mattermost_sysuser }}"
 
-    - name: INSTALL | Set up main Mattermost config file
-      template: src=mattermost_config.json dest="{{ mattermost_directory }}/config/config.json"
-
-    - name: INSTALL | Remove downloaded mattermost.tar.gz
-      file: path=/home/{{ mattermost_sysuser }}/mattermost.tar.gz state=absent
+    - name: CLEANUP | Remove downloaded mattermost.tar.gz
+      file: path=/home/{{ mattermost_sysuser }}/{{ LATEST_MM_DOWNLOADNAME }} state=absent
     
-    - name: INSTALL | Set proper permissions on mattermost app directory
-      file:
-        path: "{{ mattermost_directory }}"
-        # mode: 0755
-        owner: "{{ mattermost_sysuser }}"
-        group: "{{ mattermost_sysuser }}"
-        recurse: yes
-
-    - name: MATTERMOST | Create systemd unit file
-      template: src=mattermost.service dest=/etc/systemd/system/mattermost.service
-      notify:
-        - reload systemd
-
-    # Perhaps this would make more sense *outside* of this task block?
-    - name: MATTERMOST | Mattermost should be running, and enabled at boot
-      service: name=mattermost state=started enabled=yes
-      notify:
-        - reload nginx
- 
   # Only execute the above task block if we don't already have a Mattermost install directory
   when: mattermost_install.stat.exists == False
 
+- name: CONFIG | Set up main Mattermost config file
+  template: src=mattermost_config.json dest="{{ mattermost_directory }}/config/config.json"
+  notify:
+    - restart mattermost
+
+- name: CONFIG | Set proper permissions on mattermost app directory
+  file:
+    path: "{{ mattermost_directory }}"
+    # mode: 0755
+    owner: "{{ mattermost_sysuser }}"
+    group: "{{ mattermost_sysuser }}"
+    recurse: yes
+
+# Create either a systemd or an upstart configuration file
+# for the mattermost service -- hopefully not both
+- name: INIT | Crude Check for systemd
+  stat: path=/etc/systemd
+  register: systemd_installed
+
+- name: INIT | Crude Check for upstart
+  stat: path=/etc/init/
+  register: upstart_installed
+
+- name: INIT | Create systemd unit file
+  template: src=mattermost.service dest=/etc/systemd/system/mattermost.service
+  notify:
+    - reload systemd
+  when: systemd_installed.stat.exists
+
+- name: INIT | Create upstart init file
+  template: src=mattermost.upstart dest=/etc/init/mattermost.conf
+  when: upstart_installed.stat.exists
+
+- name: MATTERMOST | Mattermost should be running, and enabled at boot
+  service: name=mattermost state=started enabled=yes
+  notify:
+    - reload nginx

@@ -5,7 +5,6 @@
     - postgresql
     - postgresql-contrib
     - python-psycopg2
-    # - gtar
 
 - name: POSTGRES | Create mattermost database
   become: true
@@ -29,3 +28,18 @@
     name: "{{ db_user }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
+
+- block:
+  - name: POSTGRES | Set up pg_hba.conf, allow connections from webservers
+    template: src=pg_hba.conf dest={{ PG_HBA_CONF }}
+    notify:
+      - restart postgres
+
+  - name: POSTGRES | Listen on all IPs
+    lineinfile:
+      dest: "{{ PG_CONF }}"
+      line: listen_addresses='*'
+    notify:
+      - restart postgres
+  # we only open up Postgres if we're running a separate web server
+  when: hostvars[groups['webservers'][0]]['inventory_hostname'] != inventory_hostname

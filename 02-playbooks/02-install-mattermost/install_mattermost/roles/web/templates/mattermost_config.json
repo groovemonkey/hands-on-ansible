@@ -47,7 +47,7 @@
     },
     "SqlSettings": {
         "DriverName": "postgres",
-        "DataSource": "postgres://mmuser:{{ db_password }}@{{ db_server }}:5432/mattermost?sslmode={{ db_ssl_mode }}&connect_timeout=10",
+        "DataSource": "postgres://{{ db_user }}:{{ db_password }}@{{ db_server }}:5432/mattermost?sslmode={{ mm_ssl_mode }}&connect_timeout=10",
         "DataSourceReplicas": [],
         "MaxIdleConns": 10,
         "MaxOpenConns": 10,

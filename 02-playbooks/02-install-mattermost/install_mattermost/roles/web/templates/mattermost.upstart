@@ -1,0 +1,7 @@
+start on runlevel [2345]
+stop on runlevel [016]
+respawn
+limit nofile 50000 50000
+chdir {{ mattermost_directory }}
+setuid {{ mattermost_sysuser }}
+exec bin/platform
