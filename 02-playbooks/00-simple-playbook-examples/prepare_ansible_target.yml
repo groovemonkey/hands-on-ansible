@@ -17,6 +17,23 @@
       authorized_key: user=root
                       exclusive=no
                       key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    
+    - name: COMMON | Set environment
+      blockinfile:
+        dest: /etc/environment
+        block: |
+          LC_ALL=en_US.UTF-8
+          LANG=en_US.UTF-8
+      register: newenv
+    
+    - block:
+      - name: COMMON | Generate locales
+        raw: locale-gen en_US.UTF-8
+
+      - name: COMMON | Reconfigure locales
+        raw: dpkg-reconfigure locales
+      # only run this task block when we've just changed /etc/environment
+      when: newenv.changed
 
     #- name: Create /root/.ssh
     #  file: path=/root/.ssh state=directory mode=0700
