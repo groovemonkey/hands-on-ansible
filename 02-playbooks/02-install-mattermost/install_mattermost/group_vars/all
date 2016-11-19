@@ -23,7 +23,7 @@ mm_ssl_mode: disable
 ## database on the same machine as your web application
 ## mattermost will try to connect to {{ db_server }}:5432
 # grab the first DB server (this is not elegant)
-#db_server: "{{ hostvars[groups['dbservers'][0]]['ansible_default_ipv4']['address'] }}"
+# db_server: "{{ hostvars[groups['dbservers'][0]]['ansible_default_ipv4']['address'] }}"
 db_server: localhost
 
 ####################################################
@@ -48,6 +48,6 @@ mattermost_directory: /home/{{ mattermost_sysuser }}/mattermost_app
 ####################################################
 # Web
 ####################################################
-LATEST_MM_VERSION: "3.4.0"
+LATEST_MM_VERSION: "3.5.0"
 LATEST_MM_DOWNLOADNAME: "mattermost-team-{{ LATEST_MM_VERSION }}-linux-amd64.tar.gz"
 LATEST_MM_URL: https://releases.mattermost.com/{{ LATEST_MM_VERSION }}/{{ LATEST_MM_DOWNLOADNAME }}
