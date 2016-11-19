@@ -10,6 +10,9 @@
   become_method: sudo
 
   tasks:
+    - name: Update Packages
+      raw: (apt-get update && apt-get -y upgrade)
+
     - name: Install Python 2
       raw: test -e /usr/bin/python || (apt-get update && apt-get install -y python)
 
