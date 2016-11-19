@@ -25,3 +25,20 @@ Gathered facts are added to the Host variable scope. You can access them through
 
 	{{ hostvars[host]['fact_name'] }}
 
+
+
+## Fact-testing tasks
+Try running the following tasks on a host:
+
+	- name: All the things
+	  debug: msg={{ hostvars[inventory_hostname] }}
+
+	- name: However this machine is listed in the inventory
+	  debug: msg={{ inventory_hostname }}
+
+	- name: Just the hostname
+	  debug: msg={{ ansible_hostname }}
+
+	- name: Just the primary IPv4 address
+	  debug: msg={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+
