@@ -1,0 +1,24 @@
+---
+
+# Ansible Blocks
+- hosts: all
+  gather_facts: False
+  
+  tasks:
+
+    - block:
+      - name: List root
+        command: "ls /"
+      
+      - name: This will fail
+        command: "ls /nonexistent/directory"
+
+      rescue:
+        - name: Only run when a task inside the block throws an error.
+          debug: msg="Something went wrong."
+      
+      always:
+        - name: Always run.
+          debug: msg="Regardless of what happened above, we're done with this block!"
+
+...

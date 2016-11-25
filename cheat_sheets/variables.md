@@ -98,30 +98,6 @@ Dictionaries can be accessed using Python dict notation *or* dot notation:
 	dave['last_name'] or dave.last_name
 
 
-## Quoting 
-
-YAML is a bit picky about knowing where values start and end.
-
-This won't work:
-
-	vars:
-	  age_path: {{ dave.age }}/html/oldman.html
-
-
-If you start a value with a variable, you'll need to quote the whole thing:
-
-	vars:
-	  age_path: "{{ dave.age }}/html/oldman.html"
-
-
-This, however, would be fine, since the variable is in the middle of the value:
-
-	vars:
-	  age_path: /www/{{ dave.age }}/html/oldman.html
-
-Having the variable at the end of a value is fine, too. It's *only* an issue when the variable *starts* a value or parameter.
-
-
 
 ## Reserved (Magic) Variables
 

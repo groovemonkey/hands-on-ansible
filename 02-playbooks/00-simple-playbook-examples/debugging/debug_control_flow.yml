@@ -1,0 +1,78 @@
+---
+
+## put a single prepped host in 'inventory' file and run with:
+# ansible-playbook debug_control_flow.yml -i inventory -u root
+
+- hosts: all
+  gather_facts: False
+  vars:
+    nginx_conf: /etc/nginx
+    vhost_path: "{{ nginx_conf }}/conf.d/mattermost.conf"
+  tasks:
+    ## Debug
+    - name: A simple debug statement
+      debug: msg="Test debugging!"
+
+
+    - name: Check uptime in a shell
+      shell: /usr/bin/uptime
+      register: myuptime
+
+    - name: Uptime Debugging
+      debug: var=myuptime
+
+    - name: Uptime, verbosity 1
+      debug: var=myuptime verbosity=1
+
+    - name: Uptime, verbosity 2
+      debug: var=myuptime verbosity=2
+
+    - name: Uptime, verbosity 3
+      debug: var=myuptime verbosity=3
+
+
+
+    ## Register
+    - stat: path=/home/mattermost/mattermost_app
+      register: mattermost_install
+
+    - shell: whoami
+      register: user_name
+
+
+    - name: Debug user_name
+      debug: var=user_name
+
+    - name: Debug mattermost_install
+      debug: var=mattermost_install
+
+    - name: Debug user_name.stdout
+      debug: msg="{{ user_name.stdout }}"
+
+    - name: Debug user_name.stderr 
+      debug: msg="{{ user_name.stderr }}"
+
+    - name: Debug mattermost_install.stat.exists
+      debug: msg="{{ mattermost_install.stat.exists }}"
+
+
+
+    ## changed_when and failed_when -- controlling when tasks show as "changed" or "failed."
+    - command: "apt-get upgrade -y"
+      register: apt_upgrade
+      changed_when: "'0 upgraded, 0 newly installed' in apt_upgrade.stdout"
+      # changed_when: "'Processing' in apt_upgrade.stdout"
+
+    - command: "ls /some/nonexistent/dir"
+      register: mylisting
+      failed_when: "'foo' not in mylisting.stderr"
+
+
+    ## The 'defined' keyword
+    - name: Check if a variable is defined
+      debug: msg="Yes, myvariable is defined."
+      when: myvariable is defined
+
+
+
+...
