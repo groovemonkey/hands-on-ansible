@@ -6,6 +6,7 @@
 mattermost_domain: mattermost.tutorialinux.com
 db_master_pass: "masterpassy"
 
+
 ####################################################
 # EC2 + RDS
 ####################################################
@@ -22,6 +23,10 @@ db_master_name: "mattermost-db"
 db_replica_name: "mattermost-replica"
 db_master_user: "mmuser"
 database_name: "mattermost"
+
+# Required, since we're talking to an RDS instance and not localhost
+db_ssl_mode: require
+
 
 ####################################################
 # System

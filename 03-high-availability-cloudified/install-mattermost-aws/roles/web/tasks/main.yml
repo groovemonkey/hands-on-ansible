@@ -4,7 +4,7 @@
 - name: Grab RDS server name
   set_fact: rds_server="{{ lookup('file', 'group_vars/rdsname') }}"
   
-- debug: var=rds_server verbosity=1
+# - debug: var=rds_server verbosity=1
 
 - name: SYSTEM | Install util packages
   apt: name={{ item }} state=present

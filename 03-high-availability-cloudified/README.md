@@ -1,23 +1,46 @@
-## Issues to fix:
--Adding the db instance IP to a host group throws an error:
-"fatal: [localhost]: FAILED! => {"failed": true, "msg": "the field 'args' has an invalid value, which appears to include a variable that is undefined. The error was: 'item' is undefined\n\nThe error appears to have been in 'hands-on-ansible/03-high-availability-cloudified/install-mattermost-aws/provision-aws-mattermost.yml': line 44, column 7, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n      register: rds\n    - name: Add db instance IP to host group\n      ^ here\n"}"
+## Creds (temp)
 
--fix rds read replica failure on first run, maybe with a 'wait_for:'
+### AWS
+tutorialinux-vmuser-lowsec
+HeuassdckjlhnweCubenasdl42
+
+### API Creds:
+Access Key ID: AKIAJE6WLIP4BDEGLCRQ
+Secret Key: 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
 
 
 
 # Cloudify Mattermost
+
 In other words, run mattermost on AWS using EC2 and RDS.
 
 This Ansible playbook will provision EC2 and RDS instances to take care of web and database needs, and then deploy the Mattermost application onto that brand-new infrastructure environment.
 
+
 ## Control Machine Requirements
+
 Just install the `python-boto` package on your control machine.
 
+
+## Basic setup
+
+Follow the AWS Setup guide for Ansible here: http://docs.ansible.com/ansible/guide_aws.html
+
+- Set up an IAM user in AWS and securely store the Access Key ID and Secret.
+- Create a SSH keypair in your AWS EC2 dashboard. Download that key, change its permissions to 700, and put it into your ~/.ssh/ directory. Remember the name for this keypair; you'll need it to connect to your EC2 instances after you create them.
+- Set up authentication for the AWS API in your shell's rc file (probably ~/.bashrc)
+
+    export AWS_ACCESS_KEY_ID='AK123'
+    export AWS_SECRET_ACCESS_KEY='abc123'
+
+- Open a new shell to continue in, or source your rc file from your current shell.
+
+
+
 ## Running the ec2-provisioning script
+
 There are a few gotchas, since AWS is often incredibly slow.
 
-- Create a SSH keypair in your AWS --> EC2 dashboard. Download that key, change its permissions to 700, and put it into your ~/.ssh/ directory. Remember the name for this keypair; you'll need it to connect to your EC2 instances after you create them.
 - After provisioning the RDS master instance, the ansible run will fail with an error like "Failed to create replica instance: DB instance is not in the available state". Wait a few minutes until you see that RDS instance come up in your Amazon Console/Dashboard, and then just re-run the Ansible playbook.
 
 
@@ -45,7 +68,6 @@ EXAMPLE CLOUD SETUP (AWS)
 psql -h your-postgres-name.az.rds.amazonaws.com -U $DBMASTERUSER $DBNAME
 
 
-
 1. Create RDS security group (allow Postgres IN on tcp/5432)
 2. Create RDS instance (small is fine)
 
@@ -55,7 +77,7 @@ psql -h your-postgres-name.az.rds.amazonaws.com -U $DBMASTERUSER $DBNAME
     -copy to other Availability Zone
 
 3. Set up ELB
-    -round robin?
+    -round robin
 
 4. Create an autoscaling group
     -launch mattermost ec2 instances (from your template) in both AZs
