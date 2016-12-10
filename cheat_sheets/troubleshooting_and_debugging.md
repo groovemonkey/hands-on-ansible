@@ -59,3 +59,7 @@ Make sure you're using consistent indentation!
 
 
 
+## More Information
+
+Check mode: http://docs.ansible.com/ansible/playbooks_checkmode.html
+

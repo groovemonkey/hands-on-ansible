@@ -1,5 +1,0 @@
-[webservers]
-$YOUR_LXC_IP
-
-[dbservers]
-$YOUR_LXC_IP
