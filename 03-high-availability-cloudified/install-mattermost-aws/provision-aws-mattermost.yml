@@ -14,7 +14,7 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Create a basic web security group (TCP 22, 88, 443 IN)
+    - name: Create a basic web security group (TCP 22, 80, 443 IN)
       ec2_group:
         name: "{{ web_security_group_name }}"
         description: A basic web security group that allows 22, 80, and 443 inbound

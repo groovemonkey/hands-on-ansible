@@ -5,7 +5,7 @@
 ####################################################
 mattermost_domain: mattermost.tutorialinux.com
 db_master_pass: "masterpassy"
-
+aws_pubkey_name: "vmuser-lowsec"
 
 ####################################################
 # EC2 + RDS
@@ -17,7 +17,6 @@ db_security_group_name: "ansible-rds-secgroup"
 
 web_instance_count: 1
 web_ami_id: "ami-40d28157"
-aws_pubkey_name: "vmuser-lowsec"
 
 db_master_name: "mattermost-db"
 db_replica_name: "mattermost-replica"
