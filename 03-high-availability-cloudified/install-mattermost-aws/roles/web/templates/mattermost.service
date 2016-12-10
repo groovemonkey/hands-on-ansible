@@ -8,7 +8,7 @@ WorkingDirectory={{ mattermost_directory }}/bin
 User=mattermost
 ExecStart={{ mattermost_directory }}/bin/platform
 PIDFile=/var/spool/mattermost/pid/master.pid
-Requires=
+# Requires=
 
 [Install]
 WantedBy=multi-user.target

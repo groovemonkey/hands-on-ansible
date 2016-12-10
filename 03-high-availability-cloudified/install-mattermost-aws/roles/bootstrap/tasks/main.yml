@@ -1,4 +1,22 @@
 ---
 # Check to see if Python 2 is installed. If not, install it.
-- name: Install Python 2
+- name: BOOTSTRAP | Install Python 2
   raw: test -e /usr/bin/python || (apt-get update && apt-get install -y python)
+
+- name: BOOTSTRAP | Set environment
+  blockinfile:
+    dest: /etc/environment
+    block: |
+      LC_ALL=en_US.UTF-8
+      LANG=en_US.UTF-8
+  register: newenv
+
+- block:
+  - name: BOOTSTRAP | Generate locales
+    raw: locale-gen en_US.UTF-8
+
+  - name: BOOTSTRAP | Reconfigure locales
+    raw: dpkg-reconfigure locales
+  # only run this task block when we've just changed /etc/environment
+  when: newenv.changed
+

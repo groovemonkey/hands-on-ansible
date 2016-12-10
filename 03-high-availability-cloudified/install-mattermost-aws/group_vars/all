@@ -1,29 +1,27 @@
 ---
 
 ####################################################
+# Most common configuration options (CHANGE THESE):
+####################################################
+mattermost_domain: mattermost.tutorialinux.com
+db_master_pass: "masterpassy"
+
+####################################################
 # EC2 + RDS
 ####################################################
-# ansible_ssh_user: ubuntu
 
-aws_region: us-east-1
-# A basic web security group that allows 22, 80, and 443 inbound
-security_group_id: "basic-web-1"
+aws_region: "us-east-1"
+web_security_group_name: "ansible-web-secgroup"
+db_security_group_name: "ansible-rds-secgroup"
 
 web_instance_count: 1
 web_ami_id: "ami-40d28157"
-aws_pubkey_name: "tutorialinux-ansible"
+aws_pubkey_name: "vmuser-lowsec"
 
 db_master_name: "mattermost-db"
 db_replica_name: "mattermost-replica"
 db_master_user: "mmuser"
-db_master_pass: "masterpassy"
-
-
-####################################################
-# Most common configuration options:
-####################################################
-mattermost_domain: mattermost.tutorialinux.com
-
+database_name: "mattermost"
 
 ####################################################
 # System
