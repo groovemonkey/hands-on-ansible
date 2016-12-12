@@ -1,15 +1,3 @@
-## Creds (temp)
-
-### AWS
-tutorialinux-vmuser-lowsec
-HeuasDEACTIVATEDnasdl42
-
-### Example API Creds:
-Access Key ID: AKDEACTIVATEDBDEGLCRQ
-Secret Key: 4ou80DEACTIVATED1QCZmMUvls/V2vE3x
-
-
-
 # Cloudify Mattermost
 
 In other words, run mattermost on AWS using EC2 and RDS.
@@ -49,7 +37,9 @@ There are a few gotchas, since AWS is often incredibly slow.
 - changed 'package' to 'apt', since we are no longer gathering facts for the 'web' playbook (to bootstrap it)
 - 'register' sets a host variable. 'set_fact' gives you something you can use like a global variable
 
+
 ## Real-World Application
+
 For larger infrastructure (50+ machines), it can be a pain to do Amazon infrastructure the way I'm doing it here with Ansible. Tying provisioning to deployment/automation can have some complicated failure modes, especially with an agentless system like Ansible. There are hacks that involve creating dynamic inventories using external scripts to look at your Cloud Infrastructure, but that's a slightly more advanced topic than this 'basics' course can cover.
 
 This playbook just serves to show you that there's a way, without getting into prescribing how you should store the state of your infrastructure.
@@ -61,10 +51,9 @@ In real life, I'd recommend
 
 
 
-## Notes (various):
-EXAMPLE CLOUD SETUP (AWS)
+## Additional Learning Ideas:
 
-# on your EC2 instance, check that you can connect to RDS (are on the same VPC/subnet) e.g.
+##### on your EC2 instance, check that you can connect to RDS (are on the same VPC/subnet) e.g.
 psql -h your-postgres-name.az.rds.amazonaws.com -U $DBMASTERUSER $DBNAME
 
 
@@ -84,9 +73,8 @@ psql -h your-postgres-name.az.rds.amazonaws.com -U $DBMASTERUSER $DBNAME
     -min 1 instance, max 3
     -scale when CPU load is >95% for more than 2 mins.
 
-####
 
-How do we update binaries? -- Blue/Green deployment
+#### How do we update binaries? -- Blue/Green deployment
 
 1. Create new template (new mattermost version #)
 2. Create new autoscaling group with same # of EC2 instances, from new template, under the same load balancer as old one
