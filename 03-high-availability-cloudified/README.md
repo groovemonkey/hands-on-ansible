@@ -2,11 +2,11 @@
 
 ### AWS
 tutorialinux-vmuser-lowsec
-HeuassdckjlhnweCubenasdl42
+HeuasDEACTIVATEDnasdl42
 
-### API Creds:
-Access Key ID: AKIAJE6WLIP4BDEGLCRQ
-Secret Key: 4ou80d6c+gbyeUgh8DxirUA1QCZmMUvls/V2vE3x
+### Example API Creds:
+Access Key ID: AKDEACTIVATEDBDEGLCRQ
+Secret Key: 4ou80DEACTIVATED1QCZmMUvls/V2vE3x
 
 
 
