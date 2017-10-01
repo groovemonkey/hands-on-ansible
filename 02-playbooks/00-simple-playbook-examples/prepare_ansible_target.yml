@@ -34,7 +34,7 @@
         raw: locale-gen en_US.UTF-8
 
       - name: COMMON | Reconfigure locales
-        raw: dpkg-reconfigure locales
+        raw: update-locale LANG=en_US.UTF-8
       # only run this task block when we've just changed /etc/environment
       when: newenv.changed
 
