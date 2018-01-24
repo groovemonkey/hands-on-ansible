@@ -8,7 +8,7 @@ HELP_TEXT = """
 Usage: ./create_playbook.py /path/to/playbookname [role1 role2 ...]
 Creates an empty playbook skeleton, with any roles that are specified.
 
-e.g. ./create_plafybook.py /tmp/pyplaybook web db cache
+e.g. ./create_playbook.py /tmp/pyplaybook web db cache
 
 
 If /path/to/playbookname already exists, we only create the roles that don't 
@@ -123,5 +123,5 @@ def create_role(location, rolename):
         open(os.path.join(location, f), 'a').close()
 
 
-# MAIN:
-main()
+if __name__ == '__main__':
+    main()
