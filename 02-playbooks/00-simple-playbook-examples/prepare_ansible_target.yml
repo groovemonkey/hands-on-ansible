@@ -14,7 +14,7 @@
       raw: (apt-get update && apt-get -y upgrade)
 
     - name: Install Python 2
-      raw: test -e /usr/bin/python || (apt-get update && apt-get install -y python)
+      raw: test -e /usr/bin/python || (apt-get update && apt-get install -y python2)
 
     - name: Fancy way of doing authorized_keys
       authorized_key: user=root
